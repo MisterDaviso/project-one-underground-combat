@@ -151,8 +151,8 @@ var DisplayedBox = new Phaser.Class({
         this.scene = scene;
     },
     newDisplay: function(input) {
-        for(var item of input) {
-            var displayItem = new DisplayItem(0,this.currentItems.length * 20, input, this.scene);
+        for (var i=0; i<input.length; i++) {
+            var displayItem = new DisplayItem(0,this.currentItems.length * 20, input[i], this.scene);
             this.currentItems.push(displayItem);
             this.add(displayItem);
         }
