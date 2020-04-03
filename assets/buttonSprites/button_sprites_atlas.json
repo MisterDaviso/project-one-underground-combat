@@ -1,0 +1,112 @@
+{
+    "frames": [
+        {
+            "filename": "actbutton",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 0,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "mercybutton",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 0,
+                "y": 42
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "actbuttonhighlight",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 0,
+                "y": 84
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "fightbutton",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 110,
+                "y": 0
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "itembutton",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 110,
+                "y": 42
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "fightbuttonhighlight",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 110,
+                "y": 84
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "itembuttonhighlight",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 0,
+                "y": 126
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        },
+        {
+            "filename": "mercybuttonhighlight",
+            "frame": {
+                "w": 110,
+                "h": 42,
+                "x": 110,
+                "y": 126
+            },
+            "anchor": {
+                "x": 0.5,
+                "y": 0.5
+            }
+        }
+    ],
+    "meta": {
+        "description": "Atlas generado con Atlas Packer Gamma V2",
+        "web": "https://gammafp.github.io/atlas-packer-phaser/"
+    }
+}
