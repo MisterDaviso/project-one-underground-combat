@@ -18,8 +18,9 @@ var config = {
     scene: [
         BootScene,
         BattleScene,
-        SoulFightScene,
         PlayerUIScene,
+        SoulFightScene,
+        
     ],
 };
 

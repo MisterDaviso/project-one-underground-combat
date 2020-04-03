@@ -11,14 +11,14 @@ var BattleScene = new Phaser.Class({
             // Disply the HP here
         
         // When the game starts, and on each subsequent battle, start the battle
-        this.scene.run("SoulFightScene")
+        this.scene.run("PlayerUIScene")
         this.sys.events.on("wake", this.startBattle, this);
     },
     // Create the primary characters and make them part of the Scene
     createCharacters: function() {
         var player = new Player(20, 5, 0);
         this.player = player;
-        var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",1);
+        var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",15,1,4);
         this.add.existing(vegetoid);
         this.enemy = vegetoid;
     },
@@ -28,6 +28,9 @@ var BattleScene = new Phaser.Class({
         } else if (this.enemy.currentHP <=0 ) {
             
         }
+    },
+    startBattle: function() {
+        // TBD 
     },
 });
 // Custom class that contains all the data needed for a player
@@ -44,10 +47,14 @@ var Enemy = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
     initialize:
 
-    function Enemy (scene,x,y,texture,frame,hp,attack) {
+    function Enemy (scene,x,y,texture,frame,hp,attack,maxCompassion) {
         Phaser.GameObjects.Sprite.call(this,scene,x,y,texture,frame);
         this.currentHP = hp;
-        this.attack = attack
+        this.attack = attack;
+        this.name = frame;
+        this.compassion = 0;
+        this.compassionToFriend = maxCompassion;
+        this.friend = false;
     },
     // Creates the projectiles that will be launched
     basicAttack: function(scene) {
