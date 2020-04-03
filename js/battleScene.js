@@ -16,7 +16,7 @@ var BattleScene = new Phaser.Class({
     },
     // Create the primary characters and make them part of the Scene
     createCharacters: function() {
-        var player = new Player(20, 5, 0);
+        var player = new Player(20, 5, 0, ["Chocolate","Taffy"]);
         this.player = player;
         var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",15,1,4);
         this.add.existing(vegetoid);
@@ -35,11 +35,12 @@ var BattleScene = new Phaser.Class({
 });
 // Custom class that contains all the data needed for a player
 class Player {
-    constructor(maxHP, attack, defense) {
+    constructor(maxHP, attack, defense, items) {
         this.maxHP = maxHP;
         this.currentHP = maxHP;
         this.attack = attack;
         this.defense = defense;
+        this.items = items;
     }
 }
 // Custom Phaser class that establishes the current enemy

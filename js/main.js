@@ -20,7 +20,6 @@ var config = {
         BattleScene,
         PlayerUIScene,
         SoulFightScene,
-        
     ],
 };
 

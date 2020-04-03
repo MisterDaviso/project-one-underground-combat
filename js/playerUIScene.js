@@ -6,6 +6,11 @@ var PlayerUIScene = new Phaser.Class({
         Phaser.Scene.call(this, {key: "PlayerUIScene"});
     },
     create: function() {
+        // Bring in the assets from the BattleScene
+        this.battleScene = this.scene.get("BattleScene");
+        this.player = this.battleScene.player;
+        this.enemy = this.battleScene.enemy;
+
         // Create the main buttons
         this.currentButton = 0;
         var fightButton = new FightButton(this,2,500,"buttons","fightbutton","fightbuttonhighlight","fight");
@@ -146,16 +151,15 @@ var DisplayedBox = new Phaser.Class({
         this.scene = scene;
     },
     newDisplay: function(input) {
-        foreach(item in input) {
-
+        for(var item of input) {
+            var displayItem = new DisplayItem(0,this.currentItems.length * 20, input, this.scene);
+            this.currentItems.push(displayItem);
+            this.add(displayItem);
         }
-        var displayItem = new DisplayItem(0,this.currentItems.length * 20, input, this.scene);
-        this.currentItems.push(displayItem);
-        this.add(displayItem);
     },
     defaultDisplay: function() {
         this.clear()
-        this.addDisplayItem(this.defaultMessage)
+        this.newDisplay([this.defaultMessage])
     },
     clear: function() {
         for(var i=0; i<this.currentItems.length; i++) {
