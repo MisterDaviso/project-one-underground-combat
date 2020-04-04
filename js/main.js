@@ -17,9 +17,10 @@ var config = {
     },
     scene: [
         BootScene,
+        MainMenuScene,
         BattleScene,
-        PlayerUIScene,
         SoulFightScene,
+        PlayerUIScene,
     ],
 };
 

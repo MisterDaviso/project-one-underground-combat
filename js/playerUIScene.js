@@ -28,7 +28,6 @@ var PlayerUIScene = new Phaser.Class({
         this.add.existing(this.buttonBar)
 
         // Add controls
-        this.onButtons = true; // Switches between buttons and menu items
         this.input.keyboard.on('keydown', this.onKeyInput, this);
 
         // On Startup
@@ -43,13 +42,20 @@ var PlayerUIScene = new Phaser.Class({
         this.buttonBox.turnOffButtons();
         this.scene.switch("SoulFightScene");
     },
+    submitInput: function() {
+
+    },
     onKeyInput: function(event) {
         console.log("Reading input...")
         if (event.key === "ArrowLeft") {this.buttonBar.moveActiveLeft()} 
         else if (event.code === "ArrowRight") {this.buttonBar.moveActiveRight()}
-        else if (event.code === "ArrowUp") {this.buttonBar.moveOptionUp()}
-        else if (event.code === "ArrowDown") {this.buttonBar.moveOptionDown()}
-        else if (event.code === "Space") {console.log("Space!")}
+        else if (event.code === "ArrowUp" && this.buttons[this.buttonBar.activeButton].hasOptions) {
+            this.displayedBox.moveOptionUp()
+        } else if (event.code === "ArrowDown" && this.buttons[this.buttonBar.activeButton].hasOptions) {
+            this.displayedBox.moveOptionDown()
+        } else if (event.code === "Space") {
+            console.log("Space!")
+        }
     }
 });
 
@@ -75,7 +81,7 @@ var PrimaryButton = new Phaser.Class({
     },
     turnComplete: function() {
         this.battleTimer = this.time.addEvent({delay: 2000, callback: this.enemyTurn, callbackScope: this.scene})
-    }
+    },
 });
 var FightButton = new Phaser.Class({
     Extends: PrimaryButton,
@@ -164,7 +170,11 @@ var MercyButton = new Phaser.Class({
         if (this.enemy.friend) {this.displayedBox.currentItems[0].select()}
     },
     onSubmit: function() {
-        
+        if (this.enemy.friend) {
+
+        } else {
+
+        }
     },
 });
 var ButtonBar = new Phaser.Class({
@@ -176,8 +186,6 @@ var ButtonBar = new Phaser.Class({
         this.buttons = buttons;
         this.addButtons()
         this.activeButton = null;
-        this.options = scene.displayedBox.currentItems
-        this.activeOption = null;
     },
     moveActiveRight: function() {
         if (this.activeButton === null) {
@@ -187,7 +195,6 @@ var ButtonBar = new Phaser.Class({
             this.activeButton++;
             if(this.activeButton >= this.buttons.length) {this.activeButton = 0}
         }
-        this.activeOption = null;
         this.buttons[this.activeButton].changeActive();
         this.buttons[this.activeButton].onSelect();
     },
@@ -199,33 +206,8 @@ var ButtonBar = new Phaser.Class({
             this.activeButton--;
             if(this.activeButton < 0) {this.activeButton = this.buttons.length - 1}    
         }
-        this.activeOption = null;
         this.buttons[this.activeButton].changeActive();
         this.buttons[this.activeButton].onSelect();
-    },
-    moveOptionUp: function() {
-        if (this.buttons[this.activeButton].hasOptions) {
-            if (this.activeOption === null) {
-                this.activeOption = this.options.length - 1;
-            } else {
-                this.options[this.activeOption].deselect();
-                this.activeOption--;
-                if(this.activeOption < 0) {this.activeOption = this.options.length - 1;}
-            }
-            this.options[this.activeOption].select()
-        } 
-    },
-    moveOptionDown: function() {
-        if (this.buttons[this.activeButton].hasOptions) {
-            if (this.activeOption === null) {
-                this.activeOption = 0;
-            } else {
-                this.options[this.activeOption].deselect()
-                this.activeOption++;
-                if(this.activeOption >= this.options.length) {this.activeOption = 0}
-            }
-            this.options[this.activeOption].select()
-        }
     },
     submitInput: function() {
         if (this.activeButton != null && !this.buttons[this.activeButton].hasOptions) {
@@ -252,15 +234,35 @@ var DisplayedBox = new Phaser.Class({
     function NotificationBox(scene,x,y) {
         Phaser.GameObjects.Container.call(this,scene,x,y)
         this.defaultMessage = "It is your turn"
-        this.currentItems = [];
-        this.menuItemIndex = 0;
+        this.options = [];
+        this.activeOption = null;
         this.scene = scene;
+    },
+    moveOptionUp: function() {
+        if (this.activeOption === null) {
+            this.activeOption = this.options.length - 1;
+        } else {
+            this.options[this.activeOption].deselect();
+            this.activeOption--;
+            if(this.activeOption < 0) {this.activeOption = this.options.length - 1;}
+        }
+        this.options[this.activeOption].select()
+    },
+    moveOptionDown: function() {
+        if (this.activeOption === null) {
+            this.activeOption = 0;
+        } else {
+            this.options[this.activeOption].deselect()
+            this.activeOption++;
+            if(this.activeOption >= this.options.length) {this.activeOption = 0}
+        }
+        this.options[this.activeOption].select()
     },
     newDisplay: function(input) {
         this.clear();
         for (var i=0; i<input.length; i++) {
-            var displayItem = new DisplayItem(0,this.currentItems.length * 20, input[i], this.scene);
-            this.currentItems.push(displayItem);
+            var displayItem = new DisplayItem(0,this.options.length * 20, input[i], this.scene);
+            this.options.push(displayItem);
             this.add(displayItem);
         }
     },
@@ -269,11 +271,11 @@ var DisplayedBox = new Phaser.Class({
         this.newDisplay([this.defaultMessage])
     },
     clear: function() {
-        for(var i=0; i<this.currentItems.length; i++) {
-            this.currentItems[i].destroy();
+        for(var i=0; i<this.options.length; i++) {
+            this.options[i].destroy();
         }
-        this.currentItems.length = 0;
-        this.menuItemIndex = 0;
+        this.options.length = 0;
+        this.activeOption = null;
     },
 });
 var DisplayItem = new Phaser.Class({

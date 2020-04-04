@@ -11,7 +11,7 @@ var BattleScene = new Phaser.Class({
             // Disply the HP here
         
         // When the game starts, and on each subsequent battle, start the battle
-        this.scene.run("PlayerUIScene")
+        this.scene.run("SoulFightScene")
         this.sys.events.on("wake", this.startBattle, this);
     },
     // Create the primary characters and make them part of the Scene
