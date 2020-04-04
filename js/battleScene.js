@@ -6,21 +6,23 @@ var BattleScene = new Phaser.Class({
         Phaser.Scene.call(this, {key: "BattleScene"});
     },
     create: function() {    
-        // Create the characters and display their hit points
-        this.createCharacters();
-            // Disply the HP here
-        
+        // Create the space to show HP
+
+
         // When the game starts, and on each subsequent battle, start the battle
-        this.scene.run("SoulFightScene")
+        this.startBattle();
         this.sys.events.on("wake", this.startBattle, this);
     },
     // Create the primary characters and make them part of the Scene
     createCharacters: function() {
         var player = new Player(20, 5, 0, ["Chocolate","Taffy"]);
         this.player = player;
-        var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",15,1,4);
+        var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",15,3,4);
         this.add.existing(vegetoid);
         this.enemy = vegetoid;
+    },
+    endGame: function() {
+        this.scene.switch("MainMenuScene")
     },
     checkGameOver: function () {
         if (this.player.currentHP <= 0) {
@@ -30,7 +32,8 @@ var BattleScene = new Phaser.Class({
         }
     },
     startBattle: function() {
-        // TBD 
+        this.createCharacters();
+        this.scene.run("PlayerUIScene");
     },
 });
 // Custom class that contains all the data needed for a player

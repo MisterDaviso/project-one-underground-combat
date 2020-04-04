@@ -42,9 +42,6 @@ var PlayerUIScene = new Phaser.Class({
         this.buttonBox.turnOffButtons();
         this.scene.switch("SoulFightScene");
     },
-    submitInput: function() {
-
-    },
     onKeyInput: function(event) {
         console.log("Reading input...")
         if (event.key === "ArrowLeft") {this.buttonBar.moveActiveLeft()} 
@@ -56,7 +53,7 @@ var PlayerUIScene = new Phaser.Class({
         } else if (event.code === "Space") {
             console.log("Space!")
         }
-    }
+    },
 });
 
 var PrimaryButton = new Phaser.Class({
@@ -82,6 +79,9 @@ var PrimaryButton = new Phaser.Class({
     turnComplete: function() {
         this.battleTimer = this.time.addEvent({delay: 2000, callback: this.enemyTurn, callbackScope: this.scene})
     },
+    endGame: function() {
+        this.endGameTimer = this.time.addEvent({delay:2000, callback:this.battleScene.endGame, callbackScope:this.scene})
+    },
 });
 var FightButton = new Phaser.Class({
     Extends: PrimaryButton,
@@ -91,13 +91,16 @@ var FightButton = new Phaser.Class({
         this.message = "Attack for " + this.player.attack + " damage"
     },
     onSelect: function() {
-
         this.displayedBox.newDisplay([this.message])
     },
     onSubmit: function() {
-        this.turnComplete();
         this.enemy.currentHP -= this.player.attack;
-        this.scene.battleScene.checkGameOver();
+        if (this.enemy.currentHP <= 0) {
+            this.displayedBox.newDisplay(["You killed the monster!"])
+            this.endGame()
+        } else {
+            this.turnComplete();
+        }
     },
 });
 var ItemButton = new Phaser.Class({
@@ -113,14 +116,14 @@ var ItemButton = new Phaser.Class({
         else {this.displayedBox.newDisplay(["You have no items!"])}
     },
     onSubmit: function(activeOption) {
-        if(!this.hasOptions) {return}
+        if(!activeOption) {return}
         else {
-            turnComplete();
             this.options.splice(activeOption,1)
             this.player.currentHP += 5;
             if(this.player.currentHP > this.player.maxHP) {this.player.currentHP = this.player.maxHP}
             this.displayedBox.newDisplay(["You regain 5 HP!"]);
             this.checkItems();
+            turnComplete();
         }
     },
     checkItems: function() {
@@ -140,23 +143,51 @@ var ActButton = new Phaser.Class({
         this.displayedBox.newDisplay(this.options);
     },
     onSubmit: function(activeOption) {
+        switch(activeOption) {
+            case 0:
+                this.inspect(); break;
+            case 1:
+                this.insult(); break;
+            case 2:
+                this.compliment(); break;
+            case 3:
+                this.hug(); break;
+            case 4:
+                this.flee(); break;
+            default:
+                console.log("You were supposed to ACT but...")
+        }
         this.turnComplete()
 
     },
     inspect: function() {
-
+        var message
+        if ((this.enemy.compassion/this.enemy.compassionToFriend) < 1) {
+            message = ("The monster looks like it could use a hug")
+        } else {
+            message = ("The monster has",this.enemy.currentHP,"HP and is hostile toward you")
+        }
+        this.displayedBox.newDisplay([message])
     },
     insult: function() {
-
+        this.displayedBox.newDisplay(["The monster grew intimidated and weaker"]);
+        if(this.emeny.attack > 1) {this.enemy.attack--}
     },
     compliment: function() {
-
+        this.displayedBox.newDisplay(["You compliment the monster and its opinion of you grew!"]);
+        this.enemy.compassion++;
     },
     hug: function() {
-
+        if((this.enemy.compassion/this.enemy.compassionToFriend) >= 1) {
+            this.displayedBox.newDisplay(["You hug the monster. It considers you a friend!"]);
+            this.enemy.friend = true;
+        } else {
+            this.displayedBox.newDisplay(["The monster does not yet like you enough to accept a hug"]);
+        }
     },
     flee: function() {
-
+        this.displayedBox.newDisplay(["You run away from the monster!"])
+        this.endGame()
     }
 });
 var MercyButton = new Phaser.Class({
@@ -171,9 +202,11 @@ var MercyButton = new Phaser.Class({
     },
     onSubmit: function() {
         if (this.enemy.friend) {
-
+            this.displayedBox.newDisplay(["The monster waved you goodbye!"])
+            this.endGame();
         } else {
-
+            this.displayedBox.newDisplay(["The monster still wants to fight!"])
+            this.turnComplete();
         }
     },
 });
