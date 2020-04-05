@@ -32,8 +32,13 @@ var PlayerUIScene = new Phaser.Class({
         this.controlsActive = false;
 
         // On Startup
-        this.startTurn()
-        this.sys.events.on("wake", this.startTurn, this);
+        this.onStartup()
+        this.sys.events.on("wake", this.onStartup, this);
+    },
+    onStartup: function() {
+        console.log(this.player.items)
+        this.buttons[2].updateItems();
+        this.startTurn();
     },
     startTurn: function() {
         this.buttonBar.activeButton = null;
@@ -47,16 +52,14 @@ var PlayerUIScene = new Phaser.Class({
     onKeyInput: function(event) {
         if (this.controlsActive){
             console.log("Reading input...")
-            if (event.code === "ArrowLeft") {this.buttonBar.moveActiveLeft()} 
+            if (event.code === "Space") {
+                console.log("Detecting spacebar input")
+                this.buttonBar.submitInput();
+            } else if (event.code === "ArrowLeft") {this.buttonBar.moveActiveLeft()} 
             else if (event.code === "ArrowRight") {this.buttonBar.moveActiveRight()}
             else if (this.buttonBar.activeButton && this.buttons[this.buttonBar.activeButton].hasOptions) {
-                if (event.code === "ArrowUp") {
-                    this.displayedBox.moveOptionUp()
-                } else if (event.code === "ArrowDown") {
-                    this.displayedBox.moveOptionDown();
-                }
-            } else if (event.code === "Space") {
-                this.buttonBar.submitInput();
+                if (event.code === "ArrowUp") {this.displayedBox.moveOptionUp()} 
+                else if (event.code === "ArrowDown") {this.displayedBox.moveOptionDown();}
             }
         }
     },
@@ -117,6 +120,11 @@ var ItemButton = new Phaser.Class({
     initialize:
     function ItemButton (scene,x,y,texture,frame1,frame2,type) {
         PrimaryButton.call(this,scene,x,y,texture,frame1,frame2,type)
+        this.options
+        this.hasOptions
+    },
+    updateItems: function() {
+        console.log("Is the item button calling its items?")
         this.options = this.player.items
         this.hasOptions = this.checkItems()
     },
@@ -125,7 +133,7 @@ var ItemButton = new Phaser.Class({
         else {this.displayedBox.newDisplay(["You have no items!"])}
     },
     onSubmit: function(activeOption) {
-        if(!this.hasOptions) {return}
+        if(!this.hasOptions) {console.log("Yeah, it says no items");return}
         else {
             this.options.splice(activeOption,1)
             this.player.currentHP += 5;
@@ -180,7 +188,7 @@ var ActButton = new Phaser.Class({
     },
     insult: function() {
         this.displayedBox.newDisplay(["The monster grew intimidated and weaker"]);
-        if(this.enemy.attack > 1) {this.enemy.attack--}
+        this.enemy.intimidated();
     },
     compliment: function() {
         this.displayedBox.newDisplay(["You compliment the monster and its opinion of you grew!"]);
@@ -254,9 +262,11 @@ var ButtonBar = new Phaser.Class({
         this.buttons[this.activeButton].onSelect();
     },
     submitInput: function() {
+        console.log("IS IT DETECTING INPUT???")
         if (this.activeButton != null && !this.buttons[this.activeButton].hasOptions) {
             this.buttons[this.activeButton].onSubmit()
         } else if (this.activeButton != null && this.displayedBox.activeOption != null) {
+            console.log("Is it getting to the point of passing the logic to even submit input??")
             this.buttons[this.activeButton].onSubmit(this.displayedBox.activeOption)
         }
     },

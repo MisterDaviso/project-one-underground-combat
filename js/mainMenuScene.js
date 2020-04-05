@@ -8,7 +8,7 @@ var MainMenuScene = new Phaser.Class({
     create: function() {
         // Main Display
         this.title = this.add.text(100,50,"WELCOME TO THE UNDERGROUND",{fontSize:'30px',fill:'#fff'})
-        this.instructions = this.add.text(0,150,"Use Arrow keys to move around and Space to select an option",{fontSize:'20px',fill:'#fff'})
+        this.instructions = this.add.text(100,150,"Use Arrow keys to move around, Space to select an option, and Escape to leave a selection screen",{fontSize:'20px',fill:'#fff',wordWrap:{width:600,useAdvancedWrap:true}})
 
         // Main Menu
         this.textBox = this.add.graphics();

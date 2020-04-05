@@ -8,6 +8,8 @@ var BattleScene = new Phaser.Class({
     create: function() {    
         // Create the space to show HP
         this.playerHPText = this.add.text(350, 455, '', { fontSize: '15px', fill: '#fff' });
+        this.itemScene = this.scene.get("ItemSelectScene")
+        this.items = this.itemScene.selectedItems
 
         // When the game starts, and on each subsequent battle, start the battle
         this.startBattle();
@@ -21,11 +23,23 @@ var BattleScene = new Phaser.Class({
     },
     // Create the primary characters and make them part of the Scene
     createCharacters: function() {
-        var player = new Player(6, 5, 0, ["Chocolate","Taffy"]);
+        var player = new Player(6, 5, 0);
         this.player = player;
-        var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",1,3,1);
-        this.add.existing(vegetoid);
-        this.enemy = vegetoid;
+        var monster = new Enemy(this,400,50,"monsters","vegetoid",1,3,1);
+        this.add.existing(monster);
+        this.enemy = monster;
+
+        // Apply the items to the player
+        for (var i=0; i<this.items.length; i++) {
+            switch(this.items[i][0]) {
+                case "attack":
+                    this.player.attack++; break;
+                case "defense":
+                    this.enemy.intimidated(); break;
+                case "food":
+                    this.player.items.push(this.items[i][1])
+            }
+        }
     },
     updateHealth: function() {
         this.playerHPText.setText("Player HP: " + this.player.currentHP + " / " + this.player.maxHP)
@@ -40,12 +54,12 @@ var BattleScene = new Phaser.Class({
 });
 // Custom class that contains all the data needed for a player
 class Player {
-    constructor(maxHP, attack, defense, items) {
+    constructor(maxHP, attack, defense) {
         this.maxHP = maxHP;
         this.currentHP = maxHP;
         this.attack = attack;
         this.defense = defense;
-        this.items = items;
+        this.items = []
     }
 }
 // Custom Phaser class that establishes the current enemy
@@ -61,6 +75,9 @@ var Enemy = new Phaser.Class({
         this.compassion = 0;
         this.compassionToFriend = maxCompassion;
         this.friend = false;
+    },
+    intimidated: function() {
+        if ((this.attack > 1)) {this.attack--;}
     },
     // Creates the projectiles that will be launched
     basicAttack: function(scene) {
