@@ -19,6 +19,7 @@ var config = {
         BootScene,
         MainMenuScene,
         ItemSelectScene,
+        MonsterSelectScene,
         BattleScene,
         SoulFightScene,
         PlayerUIScene,

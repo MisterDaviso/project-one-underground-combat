@@ -9,7 +9,7 @@ var PlayerUIScene = new Phaser.Class({
         // Bring in the assets from the BattleScene
         this.battleScene = this.scene.get("BattleScene");
         this.player = this.battleScene.player;
-        this.enemy = this.battleScene.enemy;
+        this.monster = this.battleScene.monster;
 
         // Create the Text Box graphic
         this.textBox = this.add.graphics();
@@ -36,7 +36,6 @@ var PlayerUIScene = new Phaser.Class({
         this.sys.events.on("wake", this.onStartup, this);
     },
     onStartup: function() {
-        console.log(this.player.items)
         this.buttons[2].updateItems();
         this.startTurn();
     },
@@ -45,17 +44,15 @@ var PlayerUIScene = new Phaser.Class({
         this.controlsActive = true;
         this.displayedBox.defaultDisplay();
     },
-    enemyTurn: function() {
+    monsterTurn: function() {
         console.log("Switching to Soul Fight scene...")
         this.scene.switch("SoulFightScene");
     },
     onKeyInput: function(event) {
         if (this.controlsActive){
             console.log("Reading input...")
-            if (event.code === "Space") {
-                console.log("Detecting spacebar input")
-                this.buttonBar.submitInput();
-            } else if (event.code === "ArrowLeft") {this.buttonBar.moveActiveLeft()} 
+            if (event.code === "Space") {this.buttonBar.submitInput();} 
+            else if (event.code === "ArrowLeft") {this.buttonBar.moveActiveLeft()} 
             else if (event.code === "ArrowRight") {this.buttonBar.moveActiveRight()}
             else if (this.buttonBar.activeButton && this.buttons[this.buttonBar.activeButton].hasOptions) {
                 if (event.code === "ArrowUp") {this.displayedBox.moveOptionUp()} 
@@ -69,7 +66,7 @@ var PrimaryButton = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
     initialize:
 
-    function Button (scene, x, y, texture, frame1, frame2, type) {
+    function PrimaryButton (scene, x, y, texture, frame1, frame2, type) {
         Phaser.GameObjects.Sprite.call(this, scene, x, y, texture, frame1);
         this.frameInactive = frame1;
         this.frameActive = frame2;
@@ -77,7 +74,7 @@ var PrimaryButton = new Phaser.Class({
         this.scene = scene;
         this.displayedBox = scene.displayedBox;
         this.player = scene.player;
-        this.enemy = scene.enemy;
+        this.monster = scene.monster;
         this.endGame = false;
     },
     changeActive: function() {
@@ -90,7 +87,10 @@ var PrimaryButton = new Phaser.Class({
         this.scene.controlsActive = false;
         this.changeInactive();
         if (this.endGame) {this.scene.time.delayedCall(2000,this.scene.battleScene.endGame, null, this.scene.battleScene)}
-        else {this.scene.time.delayedCall(2000, this.scene.enemyTurn, null, this.scene)}
+        else {this.scene.time.delayedCall(2000, this.scene.monsterTurn, null, this.scene)}
+    },
+    onSelect: function() {
+
     },
 });
 var FightButton = new Phaser.Class({
@@ -104,9 +104,8 @@ var FightButton = new Phaser.Class({
         this.displayedBox.newDisplay([this.message])
     },
     onSubmit: function() {
-        console.log("Am I reading this right?")
-        this.enemy.currentHP -= this.player.attack;
-        if (this.enemy.currentHP <= 0) {
+        this.monster.currentHP -= this.player.attack;
+        if (this.monster.currentHP <= 0) {
             this.displayedBox.newDisplay(["You killed the monster!"])
             this.endGame = true;
         } else {
@@ -124,7 +123,6 @@ var ItemButton = new Phaser.Class({
         this.hasOptions
     },
     updateItems: function() {
-        console.log("Is the item button calling its items?")
         this.options = this.player.items
         this.hasOptions = this.checkItems()
     },
@@ -133,7 +131,7 @@ var ItemButton = new Phaser.Class({
         else {this.displayedBox.newDisplay(["You have no items!"])}
     },
     onSubmit: function(activeOption) {
-        if(!this.hasOptions) {console.log("Yeah, it says no items");return}
+        if(!this.hasOptions) {return;}
         else {
             this.options.splice(activeOption,1)
             this.player.currentHP += 5;
@@ -179,25 +177,25 @@ var ActButton = new Phaser.Class({
     },
     inspect: function() {
         var message
-        if ((this.enemy.compassion/this.enemy.compassionToFriend) >= 1) {
+        if ((this.monster.compassion/this.monster.compassionToFriend) >= 1) {
             message = ("The monster looks like it could use a hug")
         } else {
-            message = "The monster has "+this.enemy.currentHP+" HP and is hostile toward you"
+            message = "The monster has "+this.monster.currentHP+" HP and is hostile toward you"
         }
         this.displayedBox.newDisplay([message])
     },
     insult: function() {
         this.displayedBox.newDisplay(["The monster grew intimidated and weaker"]);
-        this.enemy.intimidated();
+        this.monster.intimidated();
     },
     compliment: function() {
         this.displayedBox.newDisplay(["You compliment the monster and its opinion of you grew!"]);
-        this.enemy.compassion++;
+        this.monster.compassion++;
     },
     hug: function() {
-        if((this.enemy.compassion/this.enemy.compassionToFriend) >= 1) {
+        if((this.monster.compassion/this.monster.compassionToFriend) >= 1) {
             this.displayedBox.newDisplay(["You hug the monster. It considers you a friend!"]);
-            this.enemy.friend = true;
+            this.monster.friend = true;
         } else {
             this.displayedBox.newDisplay(["The monster does not yet like you enough to accept a hug"]);
         }
@@ -215,10 +213,10 @@ var MercyButton = new Phaser.Class({
     },
     onSelect: function() {
         this.displayedBox.newDisplay(["Show mercy?"])
-        if (this.enemy.friend) {this.displayedBox.options[0].select()}
+        if (this.monster.friend) {this.displayedBox.options[0].select()}
     },
     onSubmit: function() {
-        if (this.enemy.friend) {
+        if (this.monster.friend) {
             this.displayedBox.newDisplay(["The monster waved you goodbye!"])
             this.endGame = true;
         } else {
@@ -262,16 +260,14 @@ var ButtonBar = new Phaser.Class({
         this.buttons[this.activeButton].onSelect();
     },
     submitInput: function() {
-        console.log("IS IT DETECTING INPUT???")
         if (this.activeButton != null && !this.buttons[this.activeButton].hasOptions) {
             this.buttons[this.activeButton].onSubmit()
         } else if (this.activeButton != null && this.displayedBox.activeOption != null) {
-            console.log("Is it getting to the point of passing the logic to even submit input??")
             this.buttons[this.activeButton].onSubmit(this.displayedBox.activeOption)
         }
     },
     addButtons: function() {
-        for(var i=0; i<4; i++) {
+        for(var i=0; i<this.buttons.length; i++) {
             this.add(this.buttons[i])
         }
     },

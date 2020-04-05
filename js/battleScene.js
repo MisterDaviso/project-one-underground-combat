@@ -9,8 +9,10 @@ var BattleScene = new Phaser.Class({
         // Create the space to show HP
         this.playerHPText = this.add.text(350, 455, '', { fontSize: '15px', fill: '#fff' });
         this.itemScene = this.scene.get("ItemSelectScene")
-        this.items = this.itemScene.selectedItems
 
+        // Create a reference to the Main Menu
+        this.mainMenu = this.scene.get("MainMenuScene")
+        
         // When the game starts, and on each subsequent battle, start the battle
         this.startBattle();
         this.sys.events.on("wake", this.startBattle, this);
@@ -23,19 +25,29 @@ var BattleScene = new Phaser.Class({
     },
     // Create the primary characters and make them part of the Scene
     createCharacters: function() {
-        var player = new Player(6, 5, 0);
-        this.player = player;
-        var monster = new Enemy(this,400,50,"monsters","vegetoid",1,3,1);
-        this.add.existing(monster);
-        this.enemy = monster;
+        // Create the player
+        this.player = new Player(10, 1, 0);
+        
+        // Create the monster
+        switch(this.mainMenu.monster) {
+            case "Vegetoid":
+                this.monster = new VegetoidMonster(this,400,50,"monsters");
+                break;
+            default:
+                this.monster = new FroggitMonster(this,400,50,"monsters");
+        }
+        this.add.existing(this.monster);
 
         // Apply the items to the player
+        if (this.itemScene.selectedItems === undefined) {this.items = []}
+        else {this.items = this.itemScene.selectedItems}
+
         for (var i=0; i<this.items.length; i++) {
             switch(this.items[i][0]) {
                 case "attack":
                     this.player.attack++; break;
                 case "defense":
-                    this.enemy.intimidated(); break;
+                    this.monster.intimidated(); break;
                 case "food":
                     this.player.items.push(this.items[i][1])
             }
@@ -52,6 +64,7 @@ var BattleScene = new Phaser.Class({
         this.scene.switch("MainMenuScene")
     },
 });
+
 // Custom class that contains all the data needed for a player
 class Player {
     constructor(maxHP, attack, defense) {
@@ -62,37 +75,64 @@ class Player {
         this.items = []
     }
 }
-// Custom Phaser class that establishes the current enemy
-var Enemy = new Phaser.Class({
+
+// Generic monster class
+var Monster = new Phaser.Class({
     Extends: Phaser.GameObjects.Sprite,
     initialize:
 
-    function Enemy (scene,x,y,texture,frame,hp,attack,maxCompassion) {
+    function Monster (scene,x,y,texture,frame) {
         Phaser.GameObjects.Sprite.call(this,scene,x,y,texture,frame);
-        this.currentHP = hp;
-        this.attack = attack;
-        this.name = frame;
         this.compassion = 0;
-        this.compassionToFriend = maxCompassion;
         this.friend = false;
+        this.attack;
+        this.projectiles;
     },
     intimidated: function() {
         if ((this.attack > 1)) {this.attack--;}
     },
-    // Creates the projectiles that will be launched
+    clearAttack: function() {
+        this.projectiles.clear(true,true)
+    },
+});
+var VegetoidMonster = new Phaser.Class({
+    Extends: Monster,
+    initialize:
+
+    function VegetoidMonster (scene,x,y,texture) {
+        Monster.call(this,scene,x,y,texture,'vegetoid')
+        this.currentHP = 12;
+        this.compassionToFriend = 4;
+        this.attack = 5;
+    },
     basicAttack: function(scene) {
         this.projectiles = scene.physics.add.group({
-            key: "monsters",
-            frame: "vegetoid_projectile",
+            key: 'monsters',
+            frame: 'vegetoid_projectile',
             repeat: 5,
-            setXY: { x: 310, y: 200, stepX: 36}
-        });
-        this.projectiles.children.iterate(function (projectile) {
-            projectile.disableBody(true, true)
-        });
-        return this.projectiles;
+            setXY: { x: 310, y: 200, stepX: 36},
+        })
+        for (var i=0; i<this.projectiles.children.size; i++) {
+            scene.time.delayedCall(i*750,this.projectiles.children.entries[i].setGravityY,[50],this.projectiles.children.entries[i])
+        }
     },
-    addGravity: function(projectile) {
-        projectile.setGravityY(50);
+});
+var FroggitMonster = new Phaser.Class({
+    Extends: Monster,
+    initialize:
+
+    function FroggitMonster (scene,x,y,texture) {
+        Monster.call(this,scene,x,y,texture,'froggit')
+        this.currentHP = 6;
+        this.compassionToFriend = 2;
+        this.attack = 6;
     },
-})
+    basicAttack: function(scene) {
+        this.projectiles = scene.physics.add.group()
+        var frog = this.projectiles.create(480,380,'monsters','froggit_projectile')
+        frog.setBounce(1.25)
+        frog.setCollideWorldBounds(true)
+        frog.setVelocity(-40,-100)
+        frog.setGravityY(60)
+    },
+});
