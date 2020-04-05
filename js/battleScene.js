@@ -7,33 +7,35 @@ var BattleScene = new Phaser.Class({
     },
     create: function() {    
         // Create the space to show HP
-
+        this.playerHPText = this.add.text(350, 455, '', { fontSize: '15px', fill: '#fff' });
 
         // When the game starts, and on each subsequent battle, start the battle
         this.startBattle();
         this.sys.events.on("wake", this.startBattle, this);
     },
+    startBattle: function() {
+        this.scene.setVisible(true)
+        this.createCharacters();
+        this.updateHealth();
+        this.scene.run("PlayerUIScene");
+    },
     // Create the primary characters and make them part of the Scene
     createCharacters: function() {
-        var player = new Player(20, 5, 0, ["Chocolate","Taffy"]);
+        var player = new Player(6, 5, 0, ["Chocolate","Taffy"]);
         this.player = player;
-        var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",15,3,4);
+        var vegetoid = new Enemy(this,400,50,"monsters","vegetoid",1,3,1);
         this.add.existing(vegetoid);
         this.enemy = vegetoid;
     },
+    updateHealth: function() {
+        this.playerHPText.setText("Player HP: " + this.player.currentHP + " / " + this.player.maxHP)
+    },
     endGame: function() {
+        console.log("Something is wrong here...")
+        this.scene.stop("PlayerUIScene")
+        this.scene.stop("SoulFightScene")
+        this.scene.setVisible(false)
         this.scene.switch("MainMenuScene")
-    },
-    checkGameOver: function () {
-        if (this.player.currentHP <= 0) {
-
-        } else if (this.enemy.currentHP <=0 ) {
-            
-        }
-    },
-    startBattle: function() {
-        this.createCharacters();
-        this.scene.run("PlayerUIScene");
     },
 });
 // Custom class that contains all the data needed for a player

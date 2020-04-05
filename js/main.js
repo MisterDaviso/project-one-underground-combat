@@ -18,6 +18,7 @@ var config = {
     scene: [
         BootScene,
         MainMenuScene,
+        ItemSelectScene,
         BattleScene,
         SoulFightScene,
         PlayerUIScene,

@@ -58,7 +58,7 @@ var SoulFightScene = new Phaser.Class({
         let iterator = 0;
         this.projectiles.children.each(function (projectile) {
             projectile.setGravityY(0)
-            projectile.enableBody(true, projectile.x, projectile.y, true, true);
+            projectile.enableBody(true, projectile.x, 200, true, true);
             this.time.delayedCall(iterator*750, this.enemy.addGravity, [projectile])
             iterator++;
         }, this)
@@ -66,10 +66,19 @@ var SoulFightScene = new Phaser.Class({
     getHit: function (soul, projectile) {
         projectile.disableBody(true, true)
         this.player.currentHP -= this.enemy.attack;
-        this.battleScene.checkGameOver()
+        this.battleScene.updateHealth();
+        if(this.player.currentHP <= 0) {
+            this.playerDies();
+        }
     },
     playerTurn: function() {
         console.log("Switching to UI scene...")
         this.scene.switch("PlayerUIScene");
-    }
+    },
+    playerDies: function() {
+        this.battleTimer.destroy()
+        this.soul.disableBody(true,true)
+        this.displayLose = this.add.text(350, 300, 'You Died!', { fontSize: '15px', fill: '#fff' });
+        this.time.delayedCall(2000,this.battleScene.endGame, null, this.battleScene)
+    },
 });

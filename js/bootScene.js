@@ -18,6 +18,6 @@ var BootScene = new Phaser.Class({
     },
 
     create: function () {
-        this.scene.start("BattleScene");
+        this.scene.start("MainMenuScene");
     }
 })
