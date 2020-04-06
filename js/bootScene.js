@@ -1,6 +1,3 @@
-/*
-    This file is strictly for booting up the game
-*/
 var BootScene = new Phaser.Class({
     Extends: Phaser.Scene,
     initialize:

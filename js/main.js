@@ -1,8 +1,3 @@
-/*
-    This file is last in the load order
-    It compiles all the scenes and creates the game
-*/
-
 var config = {
     type: Phaser.CANVAS,
     width: 800,
