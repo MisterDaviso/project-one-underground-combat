@@ -27,6 +27,7 @@ var SoulFightScene = new Phaser.Class({
         
         // Reference the Enemy (vegetoid) and a collider for the projectiles
         this.monster = this.battleScene.monster
+        this.monster.attackScene = this
         
         // Get the battle running
         this.startBattle()
@@ -53,11 +54,11 @@ var SoulFightScene = new Phaser.Class({
        this.soul.y = 300;
        this.resetControls();
        // Start the monster's attack. Keep it basic for now.
+       if(this.monster.projectiles){this.monster.clearAttack()}
        this.monster.basicAttack(this)
-       this.physics.add.collider(this.soul, this.monster.projectiles, this.getHit, null, this)
+       this.monster.collider = this.physics.add.collider(this.soul, this.monster.projectiles, this.getHit, null, this)
     },
     getHit: function (soul, projectile) {
-        console.log("You take",this.monster.attack,"damage")
         projectile.disableBody(true, true)
         this.player.currentHP -= this.monster.attack;
         this.battleScene.updateHealth();
@@ -66,8 +67,6 @@ var SoulFightScene = new Phaser.Class({
         }
     },
     playerTurn: function() {
-        // Clear the projectiles from the screen
-        this.monster.clearAttack();
         // Switch scenes
         this.scene.switch("PlayerUIScene");
     },

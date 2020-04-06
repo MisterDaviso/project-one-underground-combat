@@ -50,7 +50,6 @@ var PlayerUIScene = new Phaser.Class({
     },
     onKeyInput: function(event) {
         if (this.controlsActive){
-            console.log("Reading input...")
             if (event.code === "Space") {this.buttonBar.submitInput();} 
             else if (event.code === "ArrowLeft") {this.buttonBar.moveActiveLeft()} 
             else if (event.code === "ArrowRight") {this.buttonBar.moveActiveRight()}

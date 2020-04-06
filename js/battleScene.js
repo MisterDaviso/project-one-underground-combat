@@ -18,7 +18,9 @@ var BattleScene = new Phaser.Class({
         this.sys.events.on("wake", this.startBattle, this);
     },
     startBattle: function() {
-        if(this.monster){this.monster.destroy()}
+        if(this.monster){
+            this.monster.destroy()
+        }
         this.scene.setVisible(true)
         this.createCharacters();
         this.updateHealth();
@@ -58,7 +60,6 @@ var BattleScene = new Phaser.Class({
         this.playerHPText.setText("Player HP: " + this.player.currentHP + " / " + this.player.maxHP)
     },
     endGame: function() {
-        console.log("Something is wrong here...")
         this.scene.stop("PlayerUIScene")
         this.scene.stop("SoulFightScene")
         this.scene.setVisible(false)
@@ -88,12 +89,17 @@ var Monster = new Phaser.Class({
         this.friend = false;
         this.attack;
         this.projectiles;
+        this.attackScene
     },
     intimidated: function() {
+        console.log("Enemy attack was...",this.attack)
         if ((this.attack > 1)) {this.attack--;}
+        console.log("Enemy attack is now...",this.attack)
     },
     clearAttack: function() {
-        this.projectiles.clear(true,true)
+        this.collider.destroy()
+        this.projectiles.clear(true, true);
+        //this.projectiles.destroy()
     },
 });
 var VegetoidMonster = new Phaser.Class({

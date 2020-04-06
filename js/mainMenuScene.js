@@ -42,7 +42,6 @@ var MainMenuScene = new Phaser.Class({
         this.scene.switch("BattleScene")
     },
     selectItems: function() {
-        console.log("Selected Item Screen")
         this.scene.setVisible(false)
         this.scene.switch("ItemSelectScene")
     },
@@ -64,7 +63,6 @@ var MainMenuScene = new Phaser.Class({
         }
     },
     onInput: function() {
-        console.log("Reading input...")
         if (event.code === "ArrowUp") {this.displayedBox.moveOptionUp()}
         else if (event.code === "ArrowDown") {this.displayedBox.moveOptionDown()}
         else if (event.code === "Space") {this.onSubmit()}
@@ -132,9 +130,7 @@ var ItemSelectScene = new Phaser.Class({
         else if(event.code === "Space") {this.switchItem()}
         else if(event.code === "Escape") {this.backToMain()}
     },
-    switchActiveList: function() {
-        console.log("Switching Lists...")
-        
+    switchActiveList: function() {    
         // If there is nothing to switch to, don't
         if (this.inactiveList.options.length === 0) {return}
         // Swap the two lists around
@@ -155,7 +151,6 @@ var ItemSelectScene = new Phaser.Class({
         this.activeList.options[this.activeList.activeOption].select()
     },
     switchItem: function() {
-        console.log("Switching Item",this.activeList.activeOption,)
         // If the player has 3 items, don't give them another
         if (this.activeList == this.availableItemsList && this.selectedItemsList.options.length >= 3) {return}
 
@@ -170,7 +165,6 @@ var ItemSelectScene = new Phaser.Class({
 
         this.updateLists();
         if(this.activeList.options.length === 0) {
-            console.log("This list reads empty...")
             this.activeList.activeOption = 0;
             this.switchActiveList();
         } else if (this.activeOption > 0 && this.activeList.options.length === this.activeOption) {
@@ -217,7 +211,6 @@ var MonsterSelectScene = new Phaser.Class({
         if(this.selectedMonster === "Froggit" && this.buttonBar.activeButton != 0) {
             this.buttonBar.moveActiveRight();
         }
-        console.log("You selected:",this.selectedMonster,", and index is",this.buttonBar.activeButton)
         this.scene.setVisible(false)
         this.scene.switch("MainMenuScene")
     },
