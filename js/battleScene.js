@@ -18,6 +18,7 @@ var BattleScene = new Phaser.Class({
         this.sys.events.on("wake", this.startBattle, this);
     },
     startBattle: function() {
+        if(this.monster){this.monster.destroy()}
         this.scene.setVisible(true)
         this.createCharacters();
         this.updateHealth();
